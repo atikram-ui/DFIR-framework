@@ -80,27 +80,18 @@ evidence acquisition to structured forensic reporting.
 ---
 
 ## 🏗️ System Architecture
-┌─────────────────────────────────────────────────────────┐
-│           DFIR CORRELATION FRAMEWORK                     │
-├─────────────────────────────────────────────────────────┤
-│  Layer 1 │ Incident Input                               │
-│          │ Disk Images · Memory Dumps · Logs · PCAPs    │
-├─────────────────────────────────────────────────────────┤
-│  Layer 2 │ Evidence Acquisition                         │
-│          │ Collect · Register · Timestamp · Catalogue   │
-├─────────────────────────────────────────────────────────┤
-│  Layer 3 │ Integrity Preservation                       │
-│          │ SHA-256 Hashing · Tamper Detection · CoC     │
-├─────────────────────────────────────────────────────────┤
-│  Layer 4 │ Forensic Analysis                            │
-│          │ Log Analysis · Network · IOC Extraction      │
-├─────────────────────────────────────────────────────────┤
-│  Layer 5 │ Threat Intelligence Correlation              │
-│          │ AbuseIPDB · VirusTotal · Local Feed          │
-├─────────────────────────────────────────────────────────┤
-│  Layer 6 │ Reporting & Visualization                    │
-│          │ Timeline · Correlation · Flask Dashboard     │
-└─────────────────────────────────────────────────────────┘
+
+**Layer 1 — Incident Input** → Disk Images, Memory Dumps, Logs, PCAPs
+
+**Layer 2 — Evidence Acquisition** → Collect, Register, Timestamp, Catalogue
+
+**Layer 3 — Integrity Preservation** → SHA-256 Hashing, Tamper Detection, Chain of Custody
+
+**Layer 4 — Forensic Analysis** → Log Analysis, Network Forensics, IOC Extraction
+
+**Layer 5 — Threat Intelligence** → AbuseIPDB, VirusTotal, Local Threat Feed
+
+**Layer 6 — Reporting and Visualization** → Timeline, Correlation Engine, Flask Dashboard
 
 ---
 
