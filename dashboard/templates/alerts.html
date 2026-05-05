@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-bell-fill" style="color:#ff4d6d"></i> ALERT MANAGEMENT</h1>
+  <p>{{total}} alerts found — Page {{page}} of {{pages}}</p>
+</div>
+
+<!-- FILTERS -->
+<div class="card-dark mb-4">
+  <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <input class="dfir-input" name="q" placeholder="Search description..." value="{{q}}" style="flex:1;min-width:200px">
+    <input class="dfir-input" name="ip" placeholder="Filter by IP..." value="{{ip}}" style="width:160px">
+    <select class="dfir-input" name="severity" style="width:140px">
+      <option value="">All Severities</option>
+      {% for s in ["CRITICAL","HIGH","MEDIUM","LOW"] %}
+      <option value="{{s}}" {% if severity==s %}selected{% endif %}>{{s}}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="dfir-btn">FILTER</button>
+    <a href="/alerts" class="dfir-btn dfir-btn-red">RESET</a>
+    <a href="/report/csv" class="dfir-btn" style="margin-left:auto"><i class="bi bi-download"></i> CSV</a>
+  </form>
+</div>
+
+<!-- TABLE -->
+<div class="card-dark">
+  <table class="dfir-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Severity</th><th>Type</th><th>Source IP</th>
+        <th>Dest IP</th><th>Description</th><th>Module</th>
+        <th>Timestamp</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for a in alerts %}
+    <tr>
+      <td style="color:var(--text-mute)">{{a.id}}</td>
+      <td><span class="badge-sev sev-{{a.severity|lower}}">{{a.severity}}</span></td>
+      <td><code style="color:#00d4ff;font-size:.72rem">{{a.alert_type}}</code></td>
+      <td><code style="font-size:.72rem">{{a.source_ip or '—'}}</code></td>
+      <td><code style="font-size:.72rem;color:#8b9ab0">{{a.destination_ip or '—'}}</code></td>
+      <td style="max-width:280px;font-size:.78rem">{{a.description}}</td>
+      <td style="color:#a855f7;font-size:.7rem">{{a.source_module or '—'}}</td>
+      <td style="color:var(--text-mute);font-size:.7rem;white-space:nowrap">{{a.timestamp[:16] if a.timestamp else '—'}}</td>
+      <td>
+        <select class="dfir-input status-sel" data-id="{{a.id}}" style="padding:3px 6px;font-size:.65rem;width:90px">
+          {% for s in ["OPEN","INVESTIGATING","CLOSED"] %}
+          <option {% if a.status==s %}selected{% endif %}>{{s}}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- PAGINATION -->
+  <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+    {% for p in range(1, pages+1) %}
+    <a href="?page={{p}}&severity={{severity}}&q={{q}}&ip={{ip}}"
+       class="dfir-btn {% if p==page %}active{% endif %}"
+       style="padding:4px 12px;font-size:.7rem">{{p}}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll(".status-sel").forEach(sel => {
+  sel.addEventListener("change", async () => {
+    await fetch("/api/alerts/update_status", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ id: sel.dataset.id, status: sel.value })
+    });
+  });
+});
+</script>
+{% endblock %}

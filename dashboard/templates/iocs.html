@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}IOCs — DFIR{% endblock %}
+{% block page_title %}<i class="bi bi-crosshair2 me-2"></i>IOC Intelligence{% endblock %}
+
+{% block content %}
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label" style="color:var(--text-muted); font-size:0.75rem;">SEARCH INDICATOR</label>
+                <input type="text" name="search" class="form-control"
+                       style="background:var(--bg-dark); border-color:var(--border-color); color:var(--text-primary);"
+                       placeholder="IP, domain, hash..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" style="color:var(--text-muted); font-size:0.75rem;">IOC TYPE</label>
+                <select name="type" class="form-select"
+                        style="background:var(--bg-dark); border-color:var(--border-color); color:var(--text-primary);">
+                    <option value="ALL" {% if ioc_type_filter=='ALL' %}selected{% endif %}>All Types</option>
+                    <option value="IP" {% if ioc_type_filter=='IP' %}selected{% endif %}>IP Address</option>
+                    <option value="DOMAIN" {% if ioc_type_filter=='DOMAIN' %}selected{% endif %}>Domain</option>
+                    <option value="HASH" {% if ioc_type_filter=='HASH' %}selected{% endif %}>File Hash</option>
+                    <option value="URL" {% if ioc_type_filter=='URL' %}selected{% endif %}>URL</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel-fill"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Type badges -->
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    {% for t, cnt in type_counts.items() %}
+    <a href="{{ url_for('iocs.iocs', type=t) }}"
+       class="btn btn-sm btn-outline-info {% if ioc_type_filter==t %}active{% endif %}">
+        {{ t }}: {{ cnt }}
+    </a>
+    {% endfor %}
+</div>
+
+<!-- IOC Cards -->
+<div class="row g-3">
+    {% for ioc in iocs %}
+    <div class="col-md-6">
+        <div class="card" style="border-left: 3px solid 
+            {% if ioc.threat_score > 75 %}#dc3545
+            {% elif ioc.threat_score > 50 %}#fd7e14
+            {% elif ioc.threat_score > 25 %}#ffc107
+            {% else %}#28a745{% endif %};">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <code style="font-size:0.95rem;">{{ ioc.indicator }}</code>
+                        <span class="badge bg-secondary ms-2">{{ ioc.indicator_type }}</span>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold" style="color:
+                            {% if ioc.threat_score > 75 %}#dc3545
+                            {% elif ioc.threat_score > 50 %}#fd7e14
+                            {% elif ioc.threat_score > 25 %}#ffc107
+                            {% else %}#28a745{% endif %};">
+                            {{ ioc.threat_score }}/100
+                        </div>
+                        <small style="color:var(--text-muted);">Threat Score</small>
+                    </div>
+                </div>
+                
+                <!-- Threat bar -->
+                <div class="threat-bar mb-2">
+                    <div class="threat-fill" style="width:{{ ioc.threat_score }}%; background:
+                        {% if ioc.threat_score > 75 %}#dc3545
+                        {% elif ioc.threat_score > 50 %}#fd7e14
+                        {% elif ioc.threat_score > 25 %}#ffc107
+                        {% else %}#28a745{% endif %};"></div>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6">
+                        <small style="color:var(--text-muted);">Source:</small>
+                        <small class="ms-1">{{ ioc.source or '—' }}</small>
+                    </div>
+                    <div class="col-6">
+                        <small style="color:var(--text-muted);">Seen:</small>
+                        <small class="ms-1">{{ ioc.timestamp[:10] if ioc.timestamp else '—' }}</small>
+                    </div>
+                </div>
+                
+                {% if ioc.raw_response %}
+                <details class="mt-2">
+                    <summary style="color:var(--text-muted); font-size:0.75rem; cursor:pointer;">
+                        Intel Details
+                    </summary>
+                    <pre style="font-size:0.7rem; color:var(--text-muted); margin-top:8px; 
+                                max-height:100px; overflow-y:auto;">{{ ioc.raw_response[:300] }}</pre>
+                </details>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not iocs %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-search" style="font-size:2rem; color:var(--text-muted);"></i>
+        <p style="color:var(--text-muted); margin-top:10px;">No IOCs found matching your filter.</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

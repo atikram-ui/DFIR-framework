@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}IOC Intelligence{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-shield-exclamation" style="color:#ff8c00"></i> IOC INTELLIGENCE</h1>
+  <p>Extracted indicators of compromise with threat scores</p>
+</div>
+
+<div style="margin-bottom:16px">
+  <a href="/report/iocs/csv" class="dfir-btn"><i class="bi bi-download"></i> Export IOCs CSV</a>
+  <a href="/report/csv"      class="dfir-btn" style="margin-left:8px"><i class="bi bi-download"></i> Export Alerts CSV</a>
+</div>
+
+<div class="card-dark">
+  <table class="dfir-table">
+    <thead>
+      <tr>
+        <th>Type</th><th>IOC Value</th><th>Threat Score</th>
+        <th>Detections</th><th>Country</th><th>ISP</th>
+        <th>Abuse Conf.</th><th>Source</th><th>Last Seen</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for ioc in iocs %}
+    {% set score = ioc.threat_score or 0 %}
+    <tr>
+      <td>
+        <span style="background:rgba(0,212,255,.1);border:1px solid #00d4ff;color:#00d4ff;
+                     padding:2px 8px;border-radius:4px;font-size:.65rem">{{ioc.ioc_type|upper}}</span>
+      </td>
+      <td><code style="font-size:.75rem;color:{% if score>80 %}#ff4d6d{% elif score>50 %}#ff8c00{% else %}#ffd700{% endif %}">{{ioc.ioc_value}}</code></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:60px;height:6px;background:#1e2a3a;border-radius:3px;overflow:hidden">
+            <div style="width:{{score}}%;height:100%;background:{% if score>80 %}#ff4d6d{% elif score>50 %}#ff8c00{% else %}#39ff14{% endif %}"></div>
+          </div>
+          <span style="font-size:.75rem;font-weight:700;color:{% if score>80 %}#ff4d6d{% elif score>50 %}#ff8c00{% else %}#39ff14{% endif %}">{{score|int}}</span>
+        </div>
+      </td>
+      <td style="font-size:.78rem">
+        {% if ioc.malicious_count %}
+        <span style="color:#ff4d6d">{{ioc.malicious_count}}</span>
+        <span style="color:var(--text-mute)">/{{ioc.total_engines}}</span>
+        {% else %}—{% endif %}
+      </td>
+      <td style="font-size:.78rem">{{ioc.country or '—'}}</td>
+      <td style="font-size:.72rem;color:#8b9ab0">{{ioc.isp or '—'}}</td>
+      <td>
+        {% if ioc.abuse_confidence %}
+        <span style="color:{% if ioc.abuse_confidence>75 %}#ff4d6d{% else %}#ffd700{% endif %};font-size:.78rem">
+          {{ioc.abuse_confidence}}%
+        </span>
+        {% else %}—{% endif %}
+      </td>
+      <td style="color:#a855f7;font-size:.7rem">{{ioc.source or '—'}}</td>
+      <td style="color:var(--text-mute);font-size:.7rem">{{ioc.last_seen[:16] if ioc.last_seen else '—'}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

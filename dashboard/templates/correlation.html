@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Correlation{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-diagram-3-fill" style="color:#a855f7"></i> ATTACK CORRELATION</h1>
+  <p>Grouped multi-stage attack events by attacker IP</p>
+</div>
+
+{% for item in groups %}
+{% set g = item.group %}
+<div class="card-dark mb-4" style="border-left:3px solid {% if g.severity=='CRITICAL' %}#ff4d6d{% elif g.severity=='HIGH' %}#ff8c00{% else %}#ffd700{% endif %}">
+  <!-- GROUP HEADER -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <code style="color:#00d4ff;font-size:.9rem">{{g.group_id}}</code>
+        <span class="badge-sev sev-{{g.severity|lower}}">{{g.severity}}</span>
+        <span style="font-size:.7rem;color:var(--text-mute)">{{g.total_events}} events</span>
+      </div>
+      <div style="font-size:.8rem;margin-bottom:4px">
+        Attacker IP: <code style="color:#ff4d6d">{{g.attacker_ip}}</code>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-mute)">{{g.description}}</div>
+    </div>
+    <div style="text-align:right;font-size:.65rem;color:var(--text-mute)">
+      <div>First: {{g.first_seen[:16] if g.first_seen else '—'}}</div>
+      <div>Last:  {{g.last_seen[:16]  if g.last_seen  else '—'}}</div>
+    </div>
+  </div>
+
+  <!-- ATTACK CHAIN -->
+  <div style="margin-bottom:16px">
+    <div style="font-size:.6rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:8px">ATTACK CHAIN</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      {% for stage in item.stages %}
+      <span style="background:rgba(168,85,247,.15);border:1px solid #a855f7;color:#a855f7;
+                   padding:4px 10px;border-radius:4px;font-size:.65rem;letter-spacing:1px">
+        {{loop.index}}. {{stage}}
+      </span>
+      {% if not loop.last %}
+      <span style="color:var(--text-mute);font-size:.8rem">→</span>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- RELATED ALERTS -->
+  {% if item.alerts %}
+  <div>
+    <div style="font-size:.6rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:8px">RELATED ALERTS</div>
+    <table class="dfir-table">
+      <thead><tr><th>Severity</th><th>Type</th><th>Description</th><th>Timestamp</th></tr></thead>
+      <tbody>
+      {% for a in item.alerts %}
+      <tr>
+        <td><span class="badge-sev sev-{{a.severity|lower}}">{{a.severity}}</span></td>
+        <td><code style="color:#00d4ff;font-size:.72rem">{{a.alert_type}}</code></td>
+        <td style="font-size:.78rem">{{a.description}}</td>
+        <td style="color:var(--text-mute);font-size:.7rem">{{a.timestamp[:16] if a.timestamp else '—'}}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

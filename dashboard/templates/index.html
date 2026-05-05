@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1><i class="bi bi-speedometer2" style="color:var(--accent)"></i> INCIDENT DASHBOARD</h1>
+  <p>DFIR Correlation Framework — Real-time cyber incident monitoring</p>
+</div>
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#ff4d6d">
+      <div class="stat-val" style="color:#ff4d6d">{{critical_alerts}}</div>
+      <div class="stat-label">Critical Alerts</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#00d4ff">
+      <div class="stat-val" style="color:#00d4ff">{{total_alerts}}</div>
+      <div class="stat-label">Total Alerts</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#ffd700">
+      <div class="stat-val" style="color:#ffd700">{{open_alerts}}</div>
+      <div class="stat-label">Open Cases</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#ff8c00">
+      <div class="stat-val" style="color:#ff8c00">{{total_iocs}}</div>
+      <div class="stat-label">IOCs Extracted</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#a855f7">
+      <div class="stat-val" style="color:#a855f7">{{total_groups}}</div>
+      <div class="stat-label">Attack Groups</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="stat-card" style="--c:#39ff14">
+      <div class="stat-val" style="color:#39ff14">{{total_events}}</div>
+      <div class="stat-label">Timeline Events</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS ROW -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card-dark h-100">
+      <div style="font-size:.65rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:12px">SEVERITY DISTRIBUTION</div>
+      <canvas id="sevChart" height="180"></canvas>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card-dark h-100">
+      <div style="font-size:.65rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:12px">ALERTS OVER TIME</div>
+      <canvas id="timeChart" height="180"></canvas>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card-dark h-100">
+      <div style="font-size:.65rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:12px">ALERT TYPES</div>
+      <canvas id="typeChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM ROW -->
+<div class="row g-3">
+  <!-- TOP IPs -->
+  <div class="col-md-4">
+    <div class="card-dark h-100">
+      <div style="font-size:.65rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:14px">TOP ATTACKER IPs</div>
+      {% for ip in top_ips %}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <code style="color:#00d4ff;font-size:.78rem">{{ip.source_ip}}</code>
+        <span style="font-size:.75rem;color:#ff4d6d;font-weight:700">{{ip.cnt}} alerts</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <!-- RECENT ALERTS -->
+  <div class="col-md-8">
+    <div class="card-dark">
+      <div style="font-size:.65rem;color:var(--text-mute);letter-spacing:2px;margin-bottom:14px">RECENT ALERTS</div>
+      <table class="dfir-table">
+        <thead>
+          <tr><th>Severity</th><th>Type</th><th>Source IP</th><th>Description</th><th>Time</th></tr>
+        </thead>
+        <tbody>
+        {% for a in recent %}
+        <tr>
+          <td><span class="badge-sev sev-{{a.severity|lower}}">{{a.severity}}</span></td>
+          <td><code style="color:#00d4ff;font-size:.72rem">{{a.alert_type}}</code></td>
+          <td><code style="font-size:.72rem">{{a.source_ip or '—'}}</code></td>
+          <td style="color:#94a3b8;max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{a.description}}</td>
+          <td style="color:var(--text-mute);white-space:nowrap;font-size:.72rem">{{a.timestamp[:16] if a.timestamp else '—'}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div style="margin-top:12px">
+        <a href="/alerts" class="dfir-btn" style="font-size:.7rem">View All Alerts →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const sevData = {{ sev_data | safe }};
+const sevLabels = Object.keys(sevData);
+const sevVals   = Object.values(sevData);
+const sevColors = {"CRITICAL":"#ff4d6d","HIGH":"#ff8c00","MEDIUM":"#ffd700","LOW":"#39ff14"};
+
+new Chart(document.getElementById("sevChart"), {
+  type: "doughnut",
+  data: {
+    labels: sevLabels,
+    datasets: [{ data: sevVals, backgroundColor: sevLabels.map(l=>sevColors[l]||"#555"),
+                 borderColor:"#111827", borderWidth:2 }]
+  },
+  options: { plugins:{ legend:{ labels:{ color:"#8b9ab0", font:{ family:"Courier New", size:11 } } } },
+             cutout:"65%" }
+});
+
+new Chart(document.getElementById("timeChart"), {
+  type: "line",
+  data: {
+    labels: {{ hourly_labels | safe }},
+    datasets: [{ label:"Alerts", data: {{ hourly_values | safe }},
+                 borderColor:"#00d4ff", backgroundColor:"rgba(0,212,255,.1)",
+                 fill:true, tension:.4, pointBackgroundColor:"#00d4ff" }]
+  },
+  options: {
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ ticks:{color:"#8b9ab0",font:{family:"Courier New",size:10}}, grid:{color:"#1e2a3a"} },
+      y:{ ticks:{color:"#8b9ab0",font:{family:"Courier New",size:10}}, grid:{color:"#1e2a3a"} }
+    }
+  }
+});
+
+new Chart(document.getElementById("typeChart"), {
+  type: "bar",
+  data: {
+    labels: {{ type_labels | safe }},
+    datasets: [{ label:"Count", data: {{ type_values | safe }},
+                 backgroundColor:"rgba(168,85,247,.6)", borderColor:"#a855f7", borderWidth:1 }]
+  },
+  options: {
+    indexAxis:"y",
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ ticks:{color:"#8b9ab0",font:{family:"Courier New",size:10}}, grid:{color:"#1e2a3a"} },
+      y:{ ticks:{color:"#8b9ab0",font:{family:"Courier New",size:10}}, grid:{display:false} }
+    }
+  }
+});
+</script>
+{% endblock %}

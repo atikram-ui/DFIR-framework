@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Full Report — DFIR{% endblock %}
+{% block page_title %}<i class="bi bi-file-earmark-text-fill me-2"></i>Incident Report{% endblock %}
+
+{% block content %}
+
+<!-- Report Header -->
+<div class="card mb-4" style="border-color:#58a6ff; background:rgba(88,166,255,0.05);">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 style="color:#58a6ff; margin:0;">DFIR Incident Investigation Report</h4>
+                <small style="color:var(--text-muted);">Generated: {{ generated_at }} | Framework v1.0</small>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('reports.download_csv', type='alerts') }}" 
+                   class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-download me-1"></i>Alerts CSV
+                </a>
+                <a href="{{ url_for('reports.download_csv', type='iocs') }}" 
+                   class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-download me-1"></i>IOCs CSV
+                </a>
+                <button class="btn btn-sm btn-outline-warning" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i>Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Executive Summary -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-clipboard-data me-2"></i>Executive Summary</div>
+    <div class="card-body">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div style="font-size:2.5rem; font-weight:700; color:#dc3545;">{{ alerts|length }}</div>
+                <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Total Alerts</div>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem; font-weight:700; color:#58a6ff;">{{ iocs|length }}</div>
+                <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">IOCs Identified</div>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem; font-weight:700; color:#bc8cff;">{{ correlations|length }}</div>
+                <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Attack Chains</div>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem; font-weight:700; color:#e3b341;">{{ timeline|length }}</div>
+                <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Timeline Events</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Critical Alerts Section -->
+<div class="card mb-4">
+    <div class="card-header" style="color:#dc3545;">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>Critical & High Alerts
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Source</th><th>Description</th></tr></thead>
+            <tbody>
+                {% for a in alerts if a.severity in ['CRITICAL', 'HIGH'] %}
+                <tr>
+                    <td><small style="font-family:monospace;">{{ a.timestamp[:16] if a.timestamp else '—' }}</small></td>
+                    <td><small>{{ a.alert_type }}</small></td>
+                    <td><span class="badge badge-{{ a.severity }}">{{ a.severity }}</span></td>
+                    <td>{% if a.source_ip %}<span class="ip-badge">{{ a.source_ip }}</span>{% endif %}</td>
+                    <td><small>{{ a.description[:80] if a.description else '—' }}</small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- IOC Section -->
+<div class="card mb-4">
+    <div class="card-header" style="color:#f85149;">
+        <i class="bi bi-crosshair2 me-2"></i>Threat Indicators (IOCs)
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Indicator</th><th>Type</th><th>Threat Score</th><th>Source</th><th>Seen</th></tr></thead>
+            <tbody>
+                {% for ioc in iocs %}
+                <tr>
+                    <td><code>{{ ioc.indicator }}</code></td>
+                    <td><span class="badge bg-secondary">{{ ioc.indicator_type }}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="threat-bar" style="width:80px;">
+                                <div class="threat-fill" 
+                                     style="width:{{ ioc.threat_score }}%; background:
+                                     {% if ioc.threat_score > 75 %}#dc3545
+                                     {% elif ioc.threat_score > 50 %}#fd7e14
+                                     {% else %}#ffc107{% endif %};"></div>
+                            </div>
+                            <strong>{{ ioc.threat_score }}</strong>
+                        </div>
+                    </td>
+                    <td><small>{{ ioc.source }}</small></td>
+                    <td><small style="color:var(--text-muted);">{{ ioc.timestamp[:10] if ioc.timestamp else '—' }}</small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Correlation Section -->
+<div class="card mb-4">
+    <div class="card-header" style="color:#bc8cff;">
+        <i class="bi bi-diagram-3-fill me-2"></i>Attack Chain Correlations
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Group ID</th><th>Source IP</th><th>Attack Type</th><th>Risk</th><th>Events</th><th>Duration</th></tr></thead>
+            <tbody>
+                {% for c in correlations %}
+                <tr>
+                    <td><code>{{ c.group_id[:8] }}...</code></td>
+                    <td><span class="ip-badge">{{ c.source_ip }}</span></td>
+                    <td>{{ c.attack_type }}</td>
+                    <td>
+                        <span style="color:{% if c.risk_score > 75 %}#dc3545{% elif c.risk_score > 50 %}#fd7e14{% else %}#ffc107{% endif %};">
+                            {{ c.risk_score }}/100
+                        </span>
+                    </td>
+                    <td>{{ c.event_count }}</td>
+                    <td><small style="color:var(--text-muted);">
+                        {{ c.first_seen[:10] if c.first_seen else '—' }} → {{ c.last_seen[:10] if c.last_seen else '—' }}
+                    </small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recommendations -->
+<div class="card mb-4">
+    <div class="card-header" style="color:#3fb950;">
+        <i class="bi bi-shield-check me-2"></i>Recommendations
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% set recs = [
+                ('Block malicious IPs', 'Immediately block all IPs with threat score > 75 at firewall level.', 'exclamation-octagon', 'dc3545'),
+                ('Enable MFA', 'Multiple failed login attempts detected. Enforce MFA on all admin accounts.', 'key-fill', 'fd7e14'),
+                ('Patch Systems', 'Exploitation attempts suggest unpatched vulnerabilities. Run patch management.', 'tools', 'ffc107'),
+                ('Monitor Lateral Movement', 'Suspicious internal traffic detected. Deploy network segmentation.', 'diagram-3', 'bc8cff'),
+                ('Review Logs', 'Increase log retention and enable real-time SIEM alerting.', 'journal-text', '58a6ff'),
+                ('Incident Response', 'Consider activating full IR plan if CRITICAL alerts persist.', 'shield-exclamation', '3fb950')
+            ] %}
+            {% for title, desc, icon, color in recs %}
+            <div class="col-md-6">
+                <div class="d-flex gap-3 p-3" 
+                     style="background:rgba(255,255,255,0.02); border-radius:6px; border:1px solid var(--border-color);">
+                    <i class="bi bi-{{ icon }}" style="color:#{{ color }}; font-size:1.3rem; flex-shrink:0; margin-top:2px;"></i>
+                    <div>
+                        <strong style="font-size:0.875rem;">{{ title }}</strong>
+                        <p style="color:var(--text-muted); font-size:0.8rem; margin:4px 0 0;">{{ desc }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

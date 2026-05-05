@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}IOC Analysis{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between">
+    <div>
+        <h4><i class="fas fa-crosshairs me-2" style="color:var(--accent-orange)"></i>IOC Analysis</h4>
+        <small class="text-muted">Indicators of Compromise with threat intelligence</small>
+    </div>
+    <a href="/report/csv?type=ioc" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-download me-1"></i>Export CSV
+    </a>
+</div>
+
+<!-- Type filter badges -->
+<div class="mb-3">
+    <a href="/ioc" class="btn btn-sm me-1" style="background:#1a1a2e;border:1px solid var(--border-color)">
+        All ({{ type_counts.values()|sum }})
+    </a>
+    {% for t, count in type_counts.items() %}
+    <a href="/ioc?type={{ t }}" class="btn btn-sm me-1"
+       style="background:#1a1a2e;border:1px solid var(--border-color);{% if ioc_type_filter==t %}border-color:var(--accent-orange){% endif %}">
+        {{ t }} ({{ count }})
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Search -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control form-control-sm"
+                    placeholder="Search IOC value..." value="{{ search }}">
+            </div>
+            <input type="hidden" name="type" value="{{ ioc_type_filter }}">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-sm btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr>
+                <th>Type</th><th>IOC Value</th><th>Threat Score</th>
+                <th>Country</th><th>ISP</th><th>Tags</th><th>First Seen</th>
+            </tr></thead>
+            <tbody>
+            {% for ioc in iocs %}
+            <tr>
+                <td>
+                    <span class="badge" style="background:#1a2f4a;color:var(--accent-blue)">{{ ioc[1] }}</span>
+                </td>
+                <td><code style="color:var(--accent-orange);font-size:12px">{{ ioc[2] }}</code></td>
+                <td>
+                    {% if ioc[5] is not none %}
+                    {% set score = ioc[5]|int %}
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height:6px;background:#21262d;width:60px">
+                            <div class="progress-bar" style="width:{{ score }}%;background:
+                                {% if score > 75 %}var(--accent-red)
+                                {% elif score > 50 %}var(--accent-orange)
+                                {% elif score > 25 %}#ffd700
+                                {% else %}var(--accent-green){% endif %}">
+                            </div>
+                        </div>
+                        <small>{{ score }}%</small>
+                    </div>
+                    {% else %}<small class="text-muted">Not checked</small>{% endif %}
+                </td>
+                <td><small>{{ ioc[7] or '-' }}</small></td>
+                <td><small class="text-muted">{{ ioc[8] or '-' }}</small></td>
+                <td>{% if ioc[9] %}
+                    {% for tag in ioc[9].split(',')[:3] %}
+                    <span class="badge me-1" style="background:#2a1a1a;color:var(--accent-red);font-size:10px">{{ tag.strip() }}</span>
+                    {% endfor %}
+                {% endif %}</td>
+                <td><small class="text-muted">{{ ioc[3][:16] if ioc[3] else '-' }}</small></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center py-4 text-muted">No IOCs found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
