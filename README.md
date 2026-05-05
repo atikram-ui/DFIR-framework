@@ -279,17 +279,9 @@ chain_of_custody  → evidence access audit trail
 
 ---
 
-## 📸 Screenshots
-
-> Dashboard screenshots will be added after Phase 12 completion.
-
----
-
 ## 👨‍💻 Author
 
 **Atikram Das**
-- Enrollment: 240103003015
-- Programme: M.Sc. Digital Forensics & Information Security
 - School: School of Cyber Security & Digital Forensics
 - University: National Forensic Sciences University, Gandhinagar
 
@@ -300,15 +292,6 @@ chain_of_custody  → evidence access audit trail
 **Dr. Nilay Mistry**
 Associate Dean, SCSDF
 National Forensic Sciences University, Gandhinagar
-
----
-
-## 📅 Project Timeline
-January 2026  →  Project initiated
-February 2026 →  Phases 1-4 completed (Core Framework)
-March 2026    →  Phases 5-8 completed (Analysis Modules)
-April 2026    →  Phases 9-12 completed (Intelligence + Dashboard)
-April 2026    →  Viva conducted and evaluated satisfactory
 
 ---
 
