@@ -96,36 +96,27 @@ evidence acquisition to structured forensic reporting.
 ---
 ## 📁 Project Structure
 
-**📂 dfir_framework/**
+| Location | File | Description |
+|----------|------|-------------|
+| modules/ | evidence_collector.py | Phase 3 — Evidence Collection |
+| modules/ | integrity_checker.py | Phase 4 — SHA256 Hashing and Chain of Custody |
+| modules/ | alert_system.py | Phase 5 — Alert Management |
+| modules/ | log_analyzer.py | Phase 6 — Log Parsing and Detection |
+| modules/ | network_analyzer.py | Phase 7 — Network Packet Analysis |
+| modules/ | ioc_extractor.py | Phase 8 — IOC Extraction |
+| modules/ | threat_intel.py | Phase 9 — Threat Intelligence |
+| modules/ | correlation_engine.py | Phase 10 — Event Correlation |
+| modules/ | timeline.py | Phase 11 — Timeline Reconstruction |
+| dashboard/ | app.py | Phase 12 — Flask Web Application |
+| dashboard/templates/ | index.html | Dashboard Home Page |
+| dashboard/templates/ | alerts.html | Alerts Page |
+| dashboard/templates/ | timeline.html | Timeline Page |
+| dashboard/templates/ | correlation.html | Correlation Page |
+| database/ | schema.sql | Database Structure |
+| root/ | bootstrap_db.py | Database Initialization |
+| root/ | requirements.txt | Python Dependencies |
+| root/ | .gitignore | Git Ignore Rules |
 
-&nbsp;&nbsp;&nbsp;&nbsp;📂 **modules/**
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 evidence_collector.py — Phase 3 Evidence Collection
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 integrity_checker.py — Phase 4 SHA256 Hashing and Chain of Custody
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 alert_system.py — Phase 5 Alert Management
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 log_analyzer.py — Phase 6 Log Parsing and Detection
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 network_analyzer.py — Phase 7 Packet Analysis using Scapy
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 ioc_extractor.py — Phase 8 IOC Extraction
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 threat_intel.py — Phase 9 Threat Intelligence Integration
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 correlation_engine.py — Phase 10 Event Correlation
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 timeline.py — Phase 11 Timeline Reconstruction
-
-&nbsp;&nbsp;&nbsp;&nbsp;📂 **dashboard/**
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 app.py — Phase 12 Flask Web Application
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📂 templates/
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 index.html
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 alerts.html
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 timeline.html
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 correlation.html
-
-&nbsp;&nbsp;&nbsp;&nbsp;📂 **database/**
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 schema.sql — Database Structure
-
-&nbsp;&nbsp;&nbsp;&nbsp;📂 **evidence/** — Evidence Storage (gitignored)
-
-&nbsp;&nbsp;&nbsp;&nbsp;📄 bootstrap_db.py — Database Initialization
-&nbsp;&nbsp;&nbsp;&nbsp;📄 requirements.txt — Python Dependencies
-&nbsp;&nbsp;&nbsp;&nbsp;📄 .gitignore
-&nbsp;&nbsp;&nbsp;&nbsp;📄 README.md
 ---
 
 ## ⚙️ Installation
